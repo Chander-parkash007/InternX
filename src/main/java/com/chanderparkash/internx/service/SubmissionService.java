@@ -27,6 +27,7 @@ public class SubmissionService {
     private final UserRepository userRepository;
     private final TasksRepository tasksRepository;
     private final ApplicationsRepository applicationsRepository;
+    private final EmailService emailService;
 
     private SubmissionResponse mapToResponse(Submission submission) {
         SubmissionResponse response = new SubmissionResponse();
@@ -59,6 +60,12 @@ public class SubmissionService {
         submission.setFileUrl(request.getFileUrl());
         submission.setDescription(request.getDescription());
         Submission saved = submissionRepository.save(submission);
+        emailService.sendEmail(
+                submission.getTask().getPostedBy().getEmail(),
+                "New Submission - InternX",
+                submission.getApplicant().getName() + " has submitted work for your task '" + submission.getTask().getTitle() + "'."
+        );
+
         return mapToResponse(saved);
     }
 

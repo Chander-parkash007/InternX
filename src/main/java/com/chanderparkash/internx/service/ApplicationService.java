@@ -24,6 +24,7 @@ public class ApplicationService {
     private final TasksRepository taskRepository;
     private final ApplicationsRepository applicationsRepository;
     private final UserRepository userRepository;
+    private final EmailService emailService;
 
     private ApplicationResponse mapToResponse(Applications app) {
         ApplicationResponse response = new ApplicationResponse();
@@ -52,6 +53,12 @@ public class ApplicationService {
         application.setUser(user);
         application.setStatus(com.chanderparkash.internx.Entities.ApplicationStatus.PENDING);
         Applications saved = applicationsRepository.save(application);
+        emailService.sendEmail(
+                application.getUser().getEmail(),
+                "Application Received - InternX",
+                "Thank you for applying to '" + application.getTask().getTitle() + "'. We will get back to you soon."
+        );
+
         return mapToResponse(saved);
 
     }
@@ -90,6 +97,9 @@ public class ApplicationService {
         }
         application.setStatus(com.chanderparkash.internx.Entities.ApplicationStatus.ACCEPTED);
         Applications saved = applicationsRepository.save(application);
+        emailService.sendEmail(application.getUser().getEmail(),
+                "Application Accepted - InternX",
+                "Congratulations! Your application for '" + application.getTask().getTitle() + "' has been accepted.");
         return mapToResponse(saved);
     }
 
@@ -103,6 +113,9 @@ public class ApplicationService {
         }
         application.setStatus(com.chanderparkash.internx.Entities.ApplicationStatus.REJECTED);
         Applications saved = applicationsRepository.save(application);
+        emailService.sendEmail(application.getUser().getEmail(),
+                "Application Rejected - InternX",
+                "We regret to inform you that your application for '" + application.getTask().getTitle() + "' has been rejected. We encourage you to apply for other tasks that match your skills and interests.");
         return mapToResponse(saved);
 
     }
