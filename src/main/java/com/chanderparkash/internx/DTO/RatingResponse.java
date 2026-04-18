@@ -9,7 +9,7 @@ public class RatingResponse {
     private String fromUser;
     private String toUser;
     private String taskTitle;
-    private int rating;
+    private Double rating;
     private String feedback;
     private String ratedAt;
 

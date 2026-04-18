@@ -51,7 +51,7 @@ public class ProfileService {
 
                 }).toList();
         double averageRating = userRatings.stream()
-                .mapToInt(RatingResponse::getRating)
+                .mapToDouble(RatingResponse::getRating)
                 .average()
                 .orElse(0.0);
         int count = submissionRepository.findByApplicant(user).size();

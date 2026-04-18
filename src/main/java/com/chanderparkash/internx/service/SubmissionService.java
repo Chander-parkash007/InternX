@@ -65,6 +65,11 @@ public class SubmissionService {
                 "New Submission - InternX",
                 submission.getApplicant().getName() + " has submitted work for your task '" + submission.getTask().getTitle() + "'."
         );
+        emailService.sendEmail(
+                submission.getApplicant().getEmail(),
+                "Submission Successful - InternX",
+                "Your submission for '" + submission.getTask().getTitle() + "' has been received successfully. The task poster will review your submission and get back to you soon."
+        );
 
         return mapToResponse(saved);
     }
@@ -73,6 +78,20 @@ public class SubmissionService {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email).orElseThrow(()
                 -> new RuntimeException("User not found with email : " + email));
-        return submissionRepository.findByApplicant(user).stream().map(this::mapToResponse).collect(Collectors.toList());
+        return submissionRepository.findByApplicant(user)
+                .stream().map(this::mapToResponse).collect(Collectors.toList());
+    }
+
+    public List<SubmissionResponse> getSubmissionsForMyTask(Long taskId) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(()
+                -> new RuntimeException("User not found with email : " + email));
+        Tasks task = tasksRepository.findById(taskId).orElseThrow(()
+                -> new RuntimeException("Task not found with id : " + taskId));
+        if (!task.getPostedBy().getId().equals(user.getId())) {
+            throw new RuntimeException("You are not authorized to view submissions for this task");
+        }
+        return submissionRepository.findByTask(task)
+                .stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 }

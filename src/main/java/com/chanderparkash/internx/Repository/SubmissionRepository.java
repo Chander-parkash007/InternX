@@ -16,4 +16,6 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
 
     List<Submission> findByTask(Tasks task);
 
+    boolean existsByTask(Tasks task);
+
 }
