@@ -1,11 +1,13 @@
 package com.chanderparkash.internx.Repository;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
 import com.chanderparkash.internx.Entities.Applications;
 import com.chanderparkash.internx.Entities.Tasks;
 import com.chanderparkash.internx.Entities.User;
-import org.springframework.data.jpa.repository.JpaRepository;
-import java.util.List;
-import java.util.Optional;
 
 public interface ApplicationsRepository extends JpaRepository<Applications, Long> {
 
@@ -18,4 +20,5 @@ public interface ApplicationsRepository extends JpaRepository<Applications, Long
     boolean existsByTaskAndUser(Tasks task, User student);
 
     boolean existsByTaskAndUserAndStatus(Tasks task, User student, com.chanderparkash.internx.Entities.ApplicationStatus status);
+
 }
