@@ -22,6 +22,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final jwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
+    private final EmailService Emailservice;
 
     public String register(RegisterRequest request) {
         if (userRepo.findByEmail(request.getEmail()).isPresent()) {
@@ -33,6 +34,7 @@ public class AuthService {
         user.setRole(request.getRole());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         userRepo.save(user);
+        Emailservice.sendEmail(request.getEmail(), "Welcome to InternX", "Dear " + request.getName() + ",\n\nThank you for registering with InternX! We're excited to have you on board.\n\nBest regards,\nInternX Team");
         return "User registered successfully";
     }
 

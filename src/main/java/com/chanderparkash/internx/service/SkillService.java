@@ -24,6 +24,7 @@ public class SkillService {
     private final UserSkillsRepository userSkillsRepository;
     private final SkillsRepository skillRepository;
     private final UserRepository userRepository;
+    private final EmailService emailService;
 
     private SkillResponse mapToResponse(UserSkills us) {
         SkillResponse response = new SkillResponse();
@@ -40,6 +41,11 @@ public class SkillService {
         Skill skill = skillRepository.findBySkillName(request.getSkillName()).orElseGet(() -> {
             Skill newSkill = new Skill();
             newSkill.setSkillName(request.getSkillName());
+            emailService.sendEmail(
+                    user.getEmail(),
+                    "New Skill Added - InternX",
+                    "You have added a new skill: " + request.getSkillName() + ". Keep up the good work!"
+            );
             return skillRepository.save(newSkill);
         });
         if (userSkillsRepository.existsByUserAndSkill(user, skill)) {
@@ -48,7 +54,7 @@ public class SkillService {
         UserSkills userSkill = new UserSkills();
         userSkill.setUser(user);
         userSkill.setSkill(skill);
-        userSkill.setLevel(request.getLevel());
+        userSkill.setLevel(String.valueOf(request.getLevel()));
         UserSkills saved = userSkillsRepository.save(userSkill);
         SkillResponse response = new SkillResponse();
         response.setId(saved.getId());

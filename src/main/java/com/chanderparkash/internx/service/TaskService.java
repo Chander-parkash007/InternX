@@ -2,6 +2,7 @@ package com.chanderparkash.internx.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,7 @@ import com.chanderparkash.internx.Entities.Tasks;
 import com.chanderparkash.internx.Entities.User;
 import com.chanderparkash.internx.Repository.TasksRepository;
 import com.chanderparkash.internx.Repository.UserRepository;
+import com.chanderparkash.internx.Specification.TaskSpecification;
 
 import lombok.AllArgsConstructor;
 
@@ -21,6 +23,7 @@ public class TaskService {
 
     private final TasksRepository taskRepository;
     private final UserRepository userRepository;
+    private final EmailService emailService;
 
     public TaskResponse createTask(TaskRequest request) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -34,13 +37,22 @@ public class TaskService {
         task.setStatus(TaskStatus.OPEN);
         task.setPostedBy(user);
         Tasks savedTask = taskRepository.save(task);
+        emailService.sendEmail(
+                email,
+                "Task Created - InternX",
+                "Your task '" + savedTask.getTitle() + "' has been created successfully and is now open for applications. Good luck!"
+        );
         return new TaskResponse(savedTask.getId(), savedTask.getTitle(), savedTask.getDescription(), savedTask.getType(),
                 savedTask.getDifficulty(), savedTask.getDeadline(), savedTask.getStatus().name(),
                 savedTask.getPostedBy().getName());
     }
 
-    public Page<TaskResponse> getAllTasks(Pageable pageable) {
-        Page<Tasks> tasks = taskRepository.findAll(pageable);
+    public Page<TaskResponse> getAllTasks(String difficulty, String type, String status, Pageable pageable) {
+        Specification<Tasks> spec = Specification
+                .where(TaskSpecification.hasDifficulty(difficulty))
+                .and(TaskSpecification.hasType(type))
+                .and(TaskSpecification.hasStatus(status));
+        Page<Tasks> tasks = taskRepository.findAll(spec, pageable);
         return tasks.map(task -> {
             TaskResponse response = new TaskResponse();
             response.setId(task.getId());

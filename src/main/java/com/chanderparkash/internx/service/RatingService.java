@@ -26,6 +26,7 @@ public class RatingService {
     private final UserRepository userRepository;
     private final TasksRepository tasksRepository;
     private final SubmissionRepository submissionRepository;
+    private final EmailService emailService;
 
     private RatingResponse mapToResponse(Rating rating) {
         RatingResponse response = new RatingResponse();
@@ -63,6 +64,11 @@ public class RatingService {
         rating.setRating(request.getRating());
         rating.setFeedback(request.getFeedback());
         Rating saved = ratingRepository.save(rating);
+        emailService.sendEmail(
+                toUser.getEmail(),
+                "You received a new rating - InternX",
+                "You received a new rating of " + request.getRating() + " for your submission on '" + task.getTitle() + "'. Feedback: " + request.getFeedback()
+        );
         return mapToResponse(saved);
 
     }
