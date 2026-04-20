@@ -3,7 +3,6 @@ package com.chanderparkash.internx.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +24,7 @@ public class ApplicationService {
     private final ApplicationsRepository applicationsRepository;
     private final UserRepository userRepository;
     private final EmailService emailService;
+    private final NotificationsService notificationsService;
 
     private ApplicationResponse mapToResponse(Applications app) {
         ApplicationResponse response = new ApplicationResponse();
@@ -53,11 +53,39 @@ public class ApplicationService {
         application.setUser(user);
         application.setStatus(com.chanderparkash.internx.Entities.ApplicationStatus.PENDING);
         Applications saved = applicationsRepository.save(application);
+        //app notification
+        notificationsService.createNotification(
+                user,
+                "Your application for the task '" + task.getTitle() + "' has been received successfully. "
+                + "It is currently under review, and you will be notified once there is an update."
+        );
+//email
+        String applyMessage = "Dear " + application.getUser().getName() + ",\n\n"
+                + "We have successfully received your application for the task titled:\n"
+                + "'" + application.getTask().getTitle() + "'.\n\n"
+                + "Our team will review your application and notify you once a decision has been made.\n\n"
+                + "We appreciate your interest in InternX.\n\n"
+                + "Best regards,\n"
+                + "InternX Team";
         emailService.sendEmail(
                 application.getUser().getEmail(),
-                "Application Received - InternX",
-                "Thank you for applying to '" + application.getTask().getTitle() + "'. We will get back to you soon."
+                "Application Received - InternX", applyMessage);
+
+        // to the owner
+        notificationsService.createNotification(
+                task.getPostedBy(),
+                "You have received a new application for your task '" + task.getTitle() + "'. "
+                + "It is now awaiting your review. You can accept or reject the application from your dashboard."
         );
+//email to owner
+        String applyMessageOwner = "Dear " + task.getPostedBy().getName() + ",\n\n"
+                + "A new application has been received for your task titled:\n"
+                + "'" + application.getTask().getTitle() + "'.\n\n"
+                + "Applicant: " + application.getUser().getName() + "\n\n"
+                + "You may now review the application and decide whether to accept or reject it from your dashboard.\n\n"
+                + "Best regards,\n"
+                + "InternX Team";
+        emailService.sendEmail(task.getPostedBy().getEmail(), "Application Received - InternX", applyMessageOwner);
 
         return mapToResponse(saved);
 
@@ -97,9 +125,24 @@ public class ApplicationService {
         }
         application.setStatus(com.chanderparkash.internx.Entities.ApplicationStatus.ACCEPTED);
         Applications saved = applicationsRepository.save(application);
+        //app notification
+        notificationsService.createNotification(
+                application.getUser(),
+                "We are pleased to inform you that your application for the task '"
+                + application.getTask().getTitle()
+                + "' has been accepted. You may now proceed with the next steps as provided by the task owner."
+        );
+//email
+        String acceptMessage = "Dear " + application.getUser().getName() + ",\n\n"
+                + "We are pleased to inform you that your application for the task titled:\n"
+                + "'" + application.getTask().getTitle() + "'\n"
+                + "has been accepted.\n\n"
+                + "You may now proceed with the next steps as outlined by the task owner.\n\n"
+                + "We appreciate your participation on InternX and wish you success in your task.\n\n"
+                + "Best regards,\n"
+                + "InternX Team";
         emailService.sendEmail(application.getUser().getEmail(),
-                "Application Accepted - InternX",
-                "Congratulations! Your application for '" + application.getTask().getTitle() + "' has been accepted.");
+                "Application Accepted - InternX", acceptMessage);
         return mapToResponse(saved);
     }
 
@@ -113,9 +156,24 @@ public class ApplicationService {
         }
         application.setStatus(com.chanderparkash.internx.Entities.ApplicationStatus.REJECTED);
         Applications saved = applicationsRepository.save(application);
+        // app notification
+        notificationsService.createNotification(
+                application.getUser(),
+                "We appreciate your application for '" + application.getTask().getTitle() + "'. "
+                + "After review, it was not selected for this opportunity. "
+                + "We encourage you to apply for other tasks on InternX that align with your skills and interests."
+        );
+//email
+        String message = "Dear " + application.getUser().getName() + ",\n\n"
+                + "We appreciate your interest in the task titled:\n"
+                + "'" + application.getTask().getTitle() + "'.\n\n"
+                + "After careful review, we regret to inform you that your application has not been selected for this task.\n\n"
+                + "We encourage you to continue applying for other opportunities on InternX that match your skills and interests.\n\n"
+                + "We truly value your effort and wish you the best in your future applications.\n\n"
+                + "Best regards,\n"
+                + "InternX Team";
         emailService.sendEmail(application.getUser().getEmail(),
-                "Application Rejected - InternX",
-                "We regret to inform you that your application for '" + application.getTask().getTitle() + "' has been rejected. We encourage you to apply for other tasks that match your skills and interests.");
+                "Application Rejected - InternX", message);
         return mapToResponse(saved);
 
     }

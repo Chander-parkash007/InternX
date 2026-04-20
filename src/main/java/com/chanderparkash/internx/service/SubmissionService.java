@@ -28,6 +28,7 @@ public class SubmissionService {
     private final TasksRepository tasksRepository;
     private final ApplicationsRepository applicationsRepository;
     private final EmailService emailService;
+    private final NotificationsService notificationsService;
 
     private SubmissionResponse mapToResponse(Submission submission) {
         SubmissionResponse response = new SubmissionResponse();
@@ -60,16 +61,42 @@ public class SubmissionService {
         submission.setFileUrl(request.getFileUrl());
         submission.setDescription(request.getDescription());
         Submission saved = submissionRepository.save(submission);
+        // to the task owner
+        notificationsService.createNotification(
+                user,
+                submission.getApplicant().getName() + " has submitted work for your task '"
+                + submission.getTask().getTitle()
+                + "'. Please review the submission and provide a rating and feedback."
+        );
+        String ownerMessage = "Dear Hiring Manager,\n\n"
+                + "We would like to inform you that a new submission has been received for your task titled:\n"
+                + "'" + submission.getTask().getTitle() + "'.\n\n"
+                + "Applicant: " + submission.getApplicant().getName() + "\n\n"
+                + "You may now review the submission at your convenience and provide a rating along with feedback through the InternX platform.\n\n"
+                + "Your evaluation plays an important role in helping candidates improve and progress.\n\n"
+                + "Best regards,\n"
+                + "InternX Team";
         emailService.sendEmail(
                 submission.getTask().getPostedBy().getEmail(),
-                "New Submission - InternX",
-                submission.getApplicant().getName() + " has submitted work for your task '" + submission.getTask().getTitle() + "'."
+                "New Submission - InternX", ownerMessage);
+        // to the submitter      
+        notificationsService.createNotification(
+                submission.getApplicant(),
+                "Your submission for the task '" + submission.getTask().getTitle() + "' has been received successfully. "
+                + "The task owner will review it and you will be notified once feedback is available."
         );
+        //email
+        String submitterMessage = "Hello " + submission.getApplicant().getName() + ",\n\n"
+                + "We are pleased to inform you that your submission for the task:\n"
+                + "'" + submission.getTask().getTitle() + "'\n"
+                + "has been successfully received.\n\n"
+                + "The task owner will review your work and respond accordingly.\n\n"
+                + "You will be notified once feedback has been provided.\n\n"
+                + "Best regards,\n"
+                + "InternX Team";
         emailService.sendEmail(
                 submission.getApplicant().getEmail(),
-                "Submission Successful - InternX",
-                "Your submission for '" + submission.getTask().getTitle() + "' has been received successfully. The task poster will review your submission and get back to you soon."
-        );
+                "Submission Successful - InternX", submitterMessage);
 
         return mapToResponse(saved);
     }

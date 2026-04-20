@@ -34,7 +34,16 @@ public class AuthService {
         user.setRole(request.getRole());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         userRepo.save(user);
-        Emailservice.sendEmail(request.getEmail(), "Welcome to InternX", "Dear " + request.getName() + ",\n\nThank you for registering with InternX! We're excited to have you on board.\n\nBest regards,\nInternX Team");
+        String message = "Dear " + request.getName() + ",\n\n"
+                + "Welcome to InternX!\n\n"
+                + "Thank you for registering with us. We are delighted to have you on board and look forward to supporting you throughout your journey.\n\n"
+                + "Here are your registration details:\n"
+                + "Email: " + request.getEmail() + "\n"
+                + "Role: " + request.getRole() + "\n\n"
+                + "If you have any questions or need assistance, please feel free to reach out to our support team.\n\n"
+                + "We wish you a productive and successful experience with InternX.\n\n"
+                + "Best regards,\n"
+                + "InternX Team";
         return "User registered successfully";
     }
 

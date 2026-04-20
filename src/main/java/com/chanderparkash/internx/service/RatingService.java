@@ -27,6 +27,7 @@ public class RatingService {
     private final TasksRepository tasksRepository;
     private final SubmissionRepository submissionRepository;
     private final EmailService emailService;
+    private final NotificationsService notificationsService;
 
     private RatingResponse mapToResponse(Rating rating) {
         RatingResponse response = new RatingResponse();
@@ -64,11 +65,33 @@ public class RatingService {
         rating.setRating(request.getRating());
         rating.setFeedback(request.getFeedback());
         Rating saved = ratingRepository.save(rating);
+        //app notification
+        notificationsService.createNotification(toUser, "Dear " + toUser.getName() + ",\n\n"
+                + "We hope you are doing well.\n\n"
+                + "You have received a new rating for your recent submission on InternX.\n\n"
+                + "Details:\n"
+                + "Task Title : " + task.getTitle() + "\n"
+                + "Rating     : " + request.getRating() + "\n"
+                + "Feedback   : " + request.getFeedback() + "\n\n"
+                + "We encourage you to review the feedback and continue improving your work.\n\n"
+                + "If you have any questions, feel free to reach out to our support team.\n\n"
+                + "Best regards,\n"
+                + "InternX Team");
+        //email
+        String message = "Dear " + toUser.getName() + ",\n\n"
+                + "We hope you are doing well.\n\n"
+                + "You have received a new rating for your recent submission on InternX.\n\n"
+                + "Details:\n"
+                + "Task Title : " + task.getTitle() + "\n"
+                + "Rating     : " + request.getRating() + "\n"
+                + "Feedback   : " + request.getFeedback() + "\n\n"
+                + "We encourage you to review the feedback and continue improving your work.\n\n"
+                + "If you have any questions, feel free to reach out to our support team.\n\n"
+                + "Best regards,\n"
+                + "InternX Team";
         emailService.sendEmail(
                 toUser.getEmail(),
-                "You received a new rating - InternX",
-                "You received a new rating of " + request.getRating() + " for your submission on '" + task.getTitle() + "'. Feedback: " + request.getFeedback()
-        );
+                "You received a new rating - InternX", message);
         return mapToResponse(saved);
 
     }

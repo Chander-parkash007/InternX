@@ -28,6 +28,7 @@ public class TaskService {
     private final UserRepository userRepository;
     private final EmailService emailService;
     private final SubmissionRepository submissionRepository;
+    private final NotificationsService notificationsService;
 
     public TaskResponse createTask(TaskRequest request) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -41,11 +42,22 @@ public class TaskService {
         task.setStatus(TaskStatus.OPEN);
         task.setPostedBy(user);
         Tasks savedTask = taskRepository.save(task);
+        //app notification
+        notificationsService.createNotification(
+                user,
+                "Your task has been successfully created on InternX and is now live. "
+                + "You will be notified when users apply or submit their work."
+        );        //email
+        String taskCreationmessage = "Dear User,\n\n"
+                + "We are pleased to inform you that your task has been successfully created on InternX.\n\n"
+                + "Task Title: " + savedTask.getTitle() + "\n\n"
+                + "Your task is now live and open for applications. You will be notified when users apply or submit their work.\n\n"
+                + "You can manage your task anytime from your dashboard.\n\n"
+                + "Best regards,\n"
+                + "InternX Team";
         emailService.sendEmail(
                 email,
-                "Task Created - InternX",
-                "Your task '" + savedTask.getTitle() + "' has been created successfully and is now open for applications. Good luck!"
-        );
+                "Task Created - InternX", taskCreationmessage);
         return new TaskResponse(savedTask.getId(), savedTask.getTitle(), savedTask.getDescription(), savedTask.getType(),
                 savedTask.getDifficulty(), savedTask.getDeadline(), savedTask.getStatus().name(),
                 savedTask.getPostedBy().getName());
@@ -83,11 +95,24 @@ public class TaskService {
         }
         task.setStatus(TaskStatus.COMPLETED);
         Tasks savedTask = taskRepository.save(task);
+        //app notification
+        notificationsService.createNotification(
+                user,
+                "We would like to inform you that your task has been marked as completed on InternX. "
+                + "You may now review the final outcomes from your dashboard."
+        );
+        //email
+        String completeTaskmessage = "Dear User,\n\n"
+                + "We would like to inform you that your task has been marked as completed on InternX.\n\n"
+                + "Task Title: " + savedTask.getTitle() + "\n\n"
+                + "This indicates that the task lifecycle has been successfully finished.\n\n"
+                + "You may now review the final outcomes or archive the task from your dashboard.\n\n"
+                + "Thank you for using InternX.\n\n"
+                + "Best regards,\n"
+                + "InternX Team";
         emailService.sendEmail(
                 email,
-                "Task Completed - InternX",
-                "Your task '" + savedTask.getTitle() + "' has been marked as completed. Thank you for using InternX!"
-        );
+                "Task Completed - InternX", completeTaskmessage);
         return new TaskResponse(savedTask.getId(), savedTask.getTitle(), savedTask.getDescription(), savedTask.getType(),
                 savedTask.getDifficulty(), savedTask.getDeadline(), savedTask.getStatus().name(),
                 savedTask.getPostedBy().getName());
