@@ -24,5 +24,4 @@ public interface ApplicationsRepository extends JpaRepository<Applications, Long
 
     List<Applications> findByUserAndStatus(User user, ApplicationStatus accepted);
 
-    boolean existsByUser(User user);
 }

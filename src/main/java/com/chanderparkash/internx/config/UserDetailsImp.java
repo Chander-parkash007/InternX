@@ -24,7 +24,9 @@ public class UserDetailsImp implements UserDetailsService {
 
         User user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email : " + email));
-
+        if (!user.isActive()) {
+            throw new UsernameNotFoundException("User account is banned \n\n contact InternX team if you think your account is banned by mistake");
+        }
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),

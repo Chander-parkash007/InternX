@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.chanderparkash.internx.DTO.LoginRequest;
 import com.chanderparkash.internx.DTO.LoginResponse;
 import com.chanderparkash.internx.DTO.RegisterRequest;
+import com.chanderparkash.internx.Entities.Role;
 import com.chanderparkash.internx.Entities.User;
 import com.chanderparkash.internx.Repository.UserRepository;
 import com.chanderparkash.internx.config.jwtUtil;
@@ -28,6 +29,10 @@ public class AuthService {
         if (userRepo.findByEmail(request.getEmail()).isPresent()) {
             throw new RuntimeException("User already exists with email : " + request.getEmail());
         }
+        if (request.getRole() == Role.ADMIN) {
+            throw new RuntimeException("Cannot register as admin");
+        }
+
         User user = new User();
         user.setName(request.getName());
         user.setEmail(request.getEmail());

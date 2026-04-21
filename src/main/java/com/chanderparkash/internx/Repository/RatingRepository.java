@@ -1,14 +1,14 @@
 package com.chanderparkash.internx.Repository;
 
-import com.chanderparkash.internx.Entities.Rating;
-import com.chanderparkash.internx.Entities.Tasks;
-import com.chanderparkash.internx.Entities.User;
+import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
+import com.chanderparkash.internx.Entities.Rating;
+import com.chanderparkash.internx.Entities.Tasks;
+import com.chanderparkash.internx.Entities.User;
 
 public interface RatingRepository extends JpaRepository<Rating, Long> {
 
@@ -20,4 +20,7 @@ public interface RatingRepository extends JpaRepository<Rating, Long> {
 
     @Query("SELECT r.toUser, AVG(r.rating) as avgRating, COUNT(r) as TotalRatings " + "From Rating r GROUP BY r.toUser ORDER BY avgRating DESC")
     List<Object[]> findTopRatedStudents(Pageable pageable);
+
+    List<Rating> findByTask(Tasks task);
+
 }
