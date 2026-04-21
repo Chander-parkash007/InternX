@@ -24,4 +24,18 @@ public class TaskSpecification {
             return status == null ? null : cb.equal(root.get("status"), TaskStatus.valueOf(status));
         };
     }
+
+    public static Specification<Tasks> hasKeyword(String keyword) {
+        return (root, query, cb) -> {
+            if (keyword == null) {
+                return null;
+            }
+            String pattern = "%" + keyword.toLowerCase() + "%";
+            return cb.or(
+                    cb.like(cb.lower(root.get("title")), pattern),
+                    cb.like(cb.lower(root.get("description")), pattern)
+            );
+        };
+    }
+
 }

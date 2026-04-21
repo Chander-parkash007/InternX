@@ -63,11 +63,13 @@ public class TaskService {
                 savedTask.getPostedBy().getName());
     }
 
-    public Page<TaskResponse> getAllTasks(String difficulty, String type, String status, Pageable pageable) {
+    public Page<TaskResponse> getAllTasks(String difficulty, String type, String status, String keyword, Pageable pageable) {
         Specification<Tasks> spec = Specification
                 .where(TaskSpecification.hasDifficulty(difficulty))
                 .and(TaskSpecification.hasType(type))
-                .and(TaskSpecification.hasStatus(status));
+                .and(TaskSpecification.hasStatus(status))
+                .and(TaskSpecification.hasKeyword(keyword));
+
         Page<Tasks> tasks = taskRepository.findAll(spec, pageable);
         return tasks.map(task -> {
             TaskResponse response = new TaskResponse();

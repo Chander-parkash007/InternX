@@ -41,8 +41,9 @@ public class TaskController {
             @RequestParam(required = false) String difficulty,
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String status,
+            @RequestParam(required = false) String keyword,
             Pageable pageable) {
-        return ResponseEntity.ok(taskService.getAllTasks(difficulty, type, status, pageable));
+        return ResponseEntity.ok(taskService.getAllTasks(difficulty, type, status, keyword, pageable));
 
     }
 

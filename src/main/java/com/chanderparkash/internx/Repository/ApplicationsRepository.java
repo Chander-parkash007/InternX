@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.chanderparkash.internx.Entities.ApplicationStatus;
 import com.chanderparkash.internx.Entities.Applications;
-import com.chanderparkash.internx.Entities.TaskStatus;
 import com.chanderparkash.internx.Entities.Tasks;
 import com.chanderparkash.internx.Entities.User;
 
@@ -24,4 +23,6 @@ public interface ApplicationsRepository extends JpaRepository<Applications, Long
     boolean existsByTaskAndUserAndStatus(Tasks task, User student, com.chanderparkash.internx.Entities.ApplicationStatus status);
 
     List<Applications> findByUserAndStatus(User user, ApplicationStatus accepted);
+
+    boolean existsByUser(User user);
 }

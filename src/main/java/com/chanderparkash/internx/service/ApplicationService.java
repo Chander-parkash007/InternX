@@ -7,6 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.chanderparkash.internx.DTO.ApplicationResponse;
+import com.chanderparkash.internx.Entities.ApplicationStatus;
 import com.chanderparkash.internx.Entities.Applications;
 import com.chanderparkash.internx.Entities.Tasks;
 import com.chanderparkash.internx.Entities.User;
@@ -177,4 +178,35 @@ public class ApplicationService {
         return mapToResponse(saved);
 
     }
+
+    public String withdrawApplication(Long applicationId) {
+        Applications application = applicationsRepository.findById(applicationId
+        ).orElseThrow(() -> new RuntimeException("Applicaton not found."));
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not Found"));
+        if (!application.getUser().equals(user)) {
+            throw new RuntimeException("Apllication not found for user : " + user.getName());
+        }
+        if (application.getStatus() != ApplicationStatus.PENDING) {
+            throw new RuntimeException("User can only withdraw pending applications." + "\n\n Your application status is currently : " + application.getStatus());
+
+        }
+        applicationsRepository.delete(application);
+        // to user
+        notificationsService.createNotification(user, "Your application : " + application.getTask().getTitle() + " has been sucessfully withdrawn");
+        emailService.sendEmail(user.getEmail(),
+                "Application withdrawn Sucessfully - InternX", "Dear " + application.getUser().getName() + ",\n\n"
+                + "We are pleased to inform you that your application for the task titled:\n"
+                + "'" + application.getTask().getTitle() + "'\n"
+                + "has been withdrawn sucessfully.\n\n"
+                + "You may now proceed with next tasks of your interest.\n\n"
+                + "We appreciate your participation on InternX and wish you success in your next tasks.\n\n"
+                + "Best regards,\n"
+                + "InternX Team");
+
+        // to owner
+        notificationsService.createNotification(application.getTask().getPostedBy(), "Dear : " + application.getTask().getPostedBy().getName() + "\n\n User : " + user.getName() + " has withdrawn their apllication for your task : " + application.getTask().getTitle());
+        return "Application deleted sucessfully";
+    }
+
 }
