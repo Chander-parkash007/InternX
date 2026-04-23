@@ -49,4 +49,11 @@ public class AdminController {
         adminService.unBanUser(userId);
         return ResponseEntity.ok("User Unbanned sucessfully");
     }
+
+    @DeleteMapping("/users/{userId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
+        adminService.deleteUser(userId);
+        return ResponseEntity.ok("User deleted successfully");
+    }
 }

@@ -2,12 +2,10 @@ package com.chanderparkash.internx.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.chanderparkash.internx.DTO.ProfileResponse;
+import com.chanderparkash.internx.DTO.UpdateProfileRequest;
 import com.chanderparkash.internx.Entities.User;
 import com.chanderparkash.internx.Repository.UserRepository;
 import com.chanderparkash.internx.service.ProfileService;
@@ -35,4 +33,8 @@ public class ProfileController {
         return ResponseEntity.ok(profileService.getProfile(user.getId()));
     }
 
+    @PutMapping("/update")
+    public ResponseEntity<ProfileResponse> updateProfile(@RequestBody UpdateProfileRequest request) {
+        return ResponseEntity.ok(profileService.updateProfile(request));
+    }
 }

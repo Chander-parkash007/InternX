@@ -19,4 +19,5 @@ public class TaskResponse {
     private LocalDate deadline;
     private String status;
     private String postedBy;
+    private Long postedById;
 }

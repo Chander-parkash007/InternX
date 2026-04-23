@@ -99,4 +99,14 @@ public class AdminService {
                 + "\n\n Team InternX.");
     }
 
+    public void deleteUser(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        if (user.getRole().name().equals("ADMIN")) {
+            throw new RuntimeException("Cannot delete admin accounts");
+        }
+        emailService.sendEmail(user.getEmail(), "Account Removed - InternX",
+                "Dear " + user.getName() + ",\n\nYour account has been permanently removed from InternX by our admin team due to violation of community guidelines.\n\nBest regards,\nTeam InternX.");
+        userRepository.delete(user);
+    }
+
 }

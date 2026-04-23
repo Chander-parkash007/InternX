@@ -18,7 +18,7 @@ public class GlobalExceptionHandler {
     private ResponseEntity<Map<String, Object>> builderror(HttpStatus status, String message) {
         return ResponseEntity.status(status).body(Map.of(
                 "status", status.value(),
-                "error", message,
+                "message", message,
                 "timestamp", LocalDateTime.now().toString()
         ));
     }

@@ -61,14 +61,18 @@ public class AuthService {
     }
 
     public LoginResponse login(LoginRequest request) {
-
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(), request.getPassword()));
-        User user = userRepo.findByEmail(request.getEmail()).orElseThrow(() -> new RuntimeException("User not found "));
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(), request.getPassword()));
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid email or password");
+        }
+        
+        User user = userRepo.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
         String token = jwtUtil.generateToken(user.getEmail());
         return new LoginResponse(token, user.getRole().name(), user.getName());
-
     }
 
     public String forgotPassword(ForgotPasswordRequest request) {
@@ -92,6 +96,8 @@ public class AuthService {
                 "Dear " + user.getName() + ",\n\n"
                 + "Your password reset token is:\n\n"
                 + token + "\n\n"
+                + "Use this token on the reset password page:\n"
+                + "http://localhost:3001/reset-password?token=" + token + "\n\n"
                 + "This token expires in 15 minutes.\n\n"
                 + "Best regards,\nInternX Team"
         );

@@ -60,7 +60,7 @@ public class TaskService {
                 "Task Created - InternX", taskCreationmessage);
         return new TaskResponse(savedTask.getId(), savedTask.getTitle(), savedTask.getDescription(), savedTask.getType(),
                 savedTask.getDifficulty(), savedTask.getDeadline(), savedTask.getStatus().name(),
-                savedTask.getPostedBy().getName());
+                savedTask.getPostedBy().getName(), savedTask.getPostedBy().getId());
     }
 
     public Page<TaskResponse> getAllTasks(String difficulty, String type, String status, String keyword, Pageable pageable) {
@@ -81,6 +81,7 @@ public class TaskService {
             response.setDeadline(task.getDeadline());
             response.setStatus(task.getStatus().name());
             response.setPostedBy(task.getPostedBy().getName());
+            response.setPostedById(task.getPostedBy().getId());
             return response;
         });
     }
@@ -117,7 +118,7 @@ public class TaskService {
                 "Task Completed - InternX", completeTaskmessage);
         return new TaskResponse(savedTask.getId(), savedTask.getTitle(), savedTask.getDescription(), savedTask.getType(),
                 savedTask.getDifficulty(), savedTask.getDeadline(), savedTask.getStatus().name(),
-                savedTask.getPostedBy().getName());
+                savedTask.getPostedBy().getName(), savedTask.getPostedBy().getId());
 
     }
 
@@ -135,6 +136,7 @@ public class TaskService {
             response.setDeadline(task.getDeadline());
             response.setStatus(task.getStatus().name());
             response.setPostedBy(task.getPostedBy().getName());
+            response.setPostedById(task.getPostedBy().getId());
             return response;
         }).toList();
     }

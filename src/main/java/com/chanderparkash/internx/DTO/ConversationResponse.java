@@ -1,0 +1,14 @@
+package com.chanderparkash.internx.DTO;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ConversationResponse {
+    private UserBasicResponse otherUser;
+    private MessageResponse lastMessage;
+    private long unreadCount;
+}

@@ -34,4 +34,12 @@ public class User {
     private LocalDateTime createdAt;
     private boolean isActive = true;
 
+    @Column(columnDefinition = "TEXT")
+    private String bio;
+    private String location;
+    private String website;
+    private String profilePicture;
+    private String headline;
+    private String coverPhoto;
+
 }
