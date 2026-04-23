@@ -1,7 +1,9 @@
 [build]
 builder = "NIXPACKS"
+buildCommand = "chmod +x ./mvnw && ./mvnw -B -DskipTests clean package"
 
 [deploy]
-startCommand = "java -Dspring.profiles.active=prod -jar target/*.jar"
+startCommand = "java -Dspring.profiles.active=prod -jar $(ls target/*.jar | head -1)"
 healthcheckPath = "/actuator/health"
+healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
