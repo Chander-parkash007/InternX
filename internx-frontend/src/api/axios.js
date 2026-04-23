@@ -1,6 +1,10 @@
 import axios from 'axios'
 
-const api = axios.create({ baseURL: '/' })
+// In production (Vercel), use the VITE_API_URL env variable pointing to Railway
+// In development, use '/' so Vite proxy handles it
+const baseURL = import.meta.env.VITE_API_URL || '/'
+
+const api = axios.create({ baseURL })
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token')

@@ -2,7 +2,6 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import os from 'os'
 
-// Get local network IP automatically
 function getLocalIP() {
   const nets = os.networkInterfaces()
   for (const name of Object.keys(nets)) {
@@ -13,17 +12,26 @@ function getLocalIP() {
   return 'localhost'
 }
 
-const localIP = getLocalIP()
+export default defineConfig(({ mode }) => {
+  const localIP = getLocalIP()
+  const backendUrl = mode === 'production'
+    ? process.env.VITE_API_URL || 'http://localhost:8081'
+    : `http://${localIP}:8081`
 
-export default defineConfig({
-  plugins: [react()],
-  server: {
-    port: 3000,
-    host: true, // expose on network
-    proxy: {
-      '/api': `http://${localIP}:8081`,
-      '/admin': `http://${localIP}:8081`,
-      '/uploads': `http://${localIP}:8081`,
+  return {
+    plugins: [react()],
+    server: {
+      port: 3000,
+      host: true,
+      proxy: {
+        '/api':    { target: `http://${localIP}:8081`, changeOrigin: true },
+        '/admin':  { target: `http://${localIP}:8081`, changeOrigin: true },
+        '/uploads':{ target: `http://${localIP}:8081`, changeOrigin: true },
+        '/ws':     { target: `http://${localIP}:8081`, changeOrigin: true, ws: true },
+      },
     },
-  },
+    define: {
+      __API_URL__: JSON.stringify(backendUrl),
+    },
+  }
 })

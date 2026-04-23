@@ -41,11 +41,14 @@ public class SecurityConfig {
             config.setAllowCredentials(true);
             return config;
         }))
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/**",
+                .authorizeHttpRequests(auth -> auth.requestMatchers(
+                "/api/auth/**",
+                "/actuator/health",
                 "/v3/api-docs/**",
                 "/swagger-ui/**",
                 "/swagger-ui.html",
-                "/uploads/**").permitAll()
+                "/uploads/**",
+                "/ws/**").permitAll()
                 .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())

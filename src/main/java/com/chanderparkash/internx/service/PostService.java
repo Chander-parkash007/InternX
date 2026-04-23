@@ -7,15 +7,16 @@ import com.chanderparkash.internx.Repository.PostCommentRepository;
 import com.chanderparkash.internx.Repository.PostLikeRepository;
 import com.chanderparkash.internx.Repository.PostRepository;
 import com.chanderparkash.internx.Repository.UserRepository;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.*;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -25,8 +26,7 @@ public class PostService {
     private final UserRepository userRepository;
     private final PostLikeRepository postLikeRepository;
     private final PostCommentRepository postCommentRepository;
-
-    private static final String UPLOAD_DIR = "uploads/";
+    private final Cloudinary cloudinary;
 
     public PostResponse createPost(String content, MultipartFile image) throws IOException {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -37,11 +37,12 @@ public class PostService {
         post.setContent(content);
 
         if (image != null && !image.isEmpty()) {
-            String filename = UUID.randomUUID() + "_" + image.getOriginalFilename();
-            Path uploadPath = Paths.get(UPLOAD_DIR);
-            Files.createDirectories(uploadPath);
-            Files.copy(image.getInputStream(), uploadPath.resolve(filename), StandardCopyOption.REPLACE_EXISTING);
-            post.setImageUrl("/uploads/" + filename);
+            @SuppressWarnings("unchecked")
+            Map<String, Object> result = cloudinary.uploader().upload(
+                    image.getBytes(),
+                    ObjectUtils.asMap("folder", "internx/posts", "resource_type", "image")
+            );
+            post.setImageUrl((String) result.get("secure_url"));
         }
 
         return toResponse(postRepository.save(post), user);
@@ -82,12 +83,9 @@ public class PostService {
         r.setContent(p.getContent());
         r.setImageUrl(p.getImageUrl());
         r.setCreatedAt(p.getCreatedAt().toString());
-        
-        // Add like and comment counts
         r.setLikeCount(postLikeRepository.countByPost(p));
         r.setCommentCount(postCommentRepository.countByPost(p));
         r.setLikedByCurrentUser(postLikeRepository.existsByPostAndUser(p, currentUser));
-        
         return r;
     }
 }
