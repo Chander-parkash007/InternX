@@ -27,11 +27,17 @@ public class PostLike {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Column(name = "reaction_type", length = 10)
+    private String reactionType; // Stores emoji: 👍, ❤️, 😂, 😮, 😢, 🎉
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+        if (reactionType == null) {
+            reactionType = "👍"; // Default to thumbs up
+        }
     }
 }

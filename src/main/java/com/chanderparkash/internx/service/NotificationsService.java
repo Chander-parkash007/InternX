@@ -22,10 +22,16 @@ public class NotificationsService {
     private final UserRepository userRepository;
 
     public void createNotification(User user, String message) {
+        createNotification(user, message, null, null);
+    }
+
+    public void createNotification(User user, String message, Long relatedEntityId, String entityType) {
         Notifications notifications = new Notifications();
         notifications.setUser(user);
         notifications.setMessage(message);
         notifications.setRead(false);
+        notifications.setRelatedEntityId(relatedEntityId);
+        notifications.setEntityType(entityType);
         notificationsRepository.save(notifications);
     }
 
@@ -38,6 +44,8 @@ public class NotificationsService {
                     response.setId(n.getId());
                     response.setMessage(n.getMessage());
                     response.setIsRead(n.isRead());
+                    response.setRelatedEntityId(n.getRelatedEntityId());
+                    response.setEntityType(n.getEntityType());
                     response.setCreatedAt(n.getCreatedAt());
                     return response;
                 }).toList();

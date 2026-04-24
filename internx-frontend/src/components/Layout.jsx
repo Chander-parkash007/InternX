@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
+import { useNotificationPoller } from '../context/NotificationPollerContext'
 import api from '../api/axios'
 
 const Icon = ({ d, size = 20 }) => (
@@ -31,24 +32,16 @@ const ICONS = {
 export default function Layout() {
   const { user, logout } = useAuth()
   const { theme, toggle } = useTheme()
+  const { unreadNotifs, unreadMessages } = useNotificationPoller()
   const navigate = useNavigate()
   const location = useLocation()
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [unreadCount, setUnreadCount] = useState(0)
-  const [unreadMessages, setUnreadMessages] = useState(0)
   const [profilePicture, setProfilePicture] = useState(null)
 
-  useEffect(() => {
-    api.get('/api/notifications')
-      .then(r => setUnreadCount(r.data.filter(n => !n.read && !n.isRead).length))
-      .catch(() => {})
-    api.get('/api/messages/unread-count')
-      .then(r => setUnreadMessages(r.data || 0))
-      .catch(() => {})
-  }, [location.pathname])
+  // Keep unreadCount and unreadMessages from the poller
+  const unreadCount = unreadNotifs
 
   useEffect(() => {
-    // Fetch user profile picture
     api.get('/api/profile/myprofile')
       .then(r => setProfilePicture(r.data.profilePicture))
       .catch(() => {})

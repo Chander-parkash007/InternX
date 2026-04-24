@@ -85,11 +85,12 @@ public class FeedService {
         PostLike like = new PostLike();
         like.setPost(post);
         like.setUser(user);
+        like.setReactionType("👍"); // Default reaction
         postLikeRepository.save(like);
         // Notify post owner (not self)
         if (!post.getUser().getId().equals(userId)) {
             notificationsService.createNotification(post.getUser(),
-                    user.getName() + " liked your post.");
+                    user.getName() + " liked your post.", postId, "POST");
         }
     }
 
@@ -119,7 +120,7 @@ public class FeedService {
         // Notify post owner (not self)
         if (!post.getUser().getId().equals(userId)) {
             notificationsService.createNotification(post.getUser(),
-                    user.getName() + " commented on your post: \"" + content + "\"");
+                    user.getName() + " commented on your post: \"" + content + "\"", postId, "POST");
         }
         return CommentResponse.fromComment(savedComment);
     }

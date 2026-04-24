@@ -33,6 +33,10 @@ public class Notifications {
     private String message;
     @Column(nullable = false)
     private boolean isRead = false;
+    @Column(name = "related_entity_id")
+    private Long relatedEntityId; // ID of the post, task, or other entity related to this notification
+    @Column(name = "entity_type", length = 50)
+    private String entityType; // Type: POST, TASK, CONNECTION, etc.
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
