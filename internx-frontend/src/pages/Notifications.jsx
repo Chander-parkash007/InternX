@@ -34,14 +34,8 @@ export default function Notifications() {
   useEffect(() => {
     setLoading(true)
     api.get('/api/notifications')
-      .then(r => {
-        console.log('Notifications API Response:', r.data)
-        setNotifs(r.data)
-      })
-      .catch(err => {
-        console.error('Failed to fetch notifications:', err)
-        console.error('Error response:', err.response?.data)
-      })
+      .then(r => setNotifs(r.data))
+      .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
 

@@ -11,14 +11,8 @@ export default function Dashboard() {
 
   useEffect(() => {
     api.get('/api/dashboard')
-      .then(r => {
-        console.log('Dashboard API Response:', r.data)
-        setData(r.data)
-      })
-      .catch(err => {
-        console.error('Failed to fetch dashboard:', err)
-        console.error('Error response:', err.response?.data)
-      })
+      .then(r => setData(r.data))
+      .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
 

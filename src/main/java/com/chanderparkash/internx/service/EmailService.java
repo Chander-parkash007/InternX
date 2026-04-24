@@ -1,13 +1,14 @@
 package com.chanderparkash.internx.service;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-import lombok.RequiredArgsConstructor;
-
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EmailService {
 
     private final JavaMailSender mailSender;
@@ -19,10 +20,9 @@ public class EmailService {
             message.setSubject(subject);
             message.setText(body);
             mailSender.send(message);
-            System.out.println("Email sent to: " + to);
+            log.info("Email sent to: {}", to);
         } catch (Exception e) {
-            System.out.println("Email failed: " + e.getMessage());
+            log.error("Email failed for {}: {}", to, e.getMessage());
         }
     }
-
 }
