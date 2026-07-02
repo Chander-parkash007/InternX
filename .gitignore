@@ -36,3 +36,8 @@ src/main/resources/application.properties
 ### Uploads ###
 uploads/
 
+
+run-me.ps1
+*.local.ps1
+
+run-me.ps1
