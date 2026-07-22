@@ -41,3 +41,4 @@ run-me.ps1
 *.local.ps1
 
 run-me.ps1
+.env

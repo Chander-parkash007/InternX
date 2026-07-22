@@ -65,7 +65,6 @@ public class RatingService {
         rating.setRating(request.getRating());
         rating.setFeedback(request.getFeedback());
         Rating saved = ratingRepository.save(rating);
-        //app notification
         notificationsService.createNotification(toUser, "Dear " + toUser.getName() + ",\n\n"
                 + "We hope you are doing well.\n\n"
                 + "You have received a new rating for your recent submission on InternX.\n\n"
@@ -77,7 +76,6 @@ public class RatingService {
                 + "If you have any questions, feel free to reach out to our support team.\n\n"
                 + "Best regards,\n"
                 + "InternX Team");
-        //email
         String message = "Dear " + toUser.getName() + ",\n\n"
                 + "We hope you are doing well.\n\n"
                 + "You have received a new rating for your recent submission on InternX.\n\n"
@@ -89,11 +87,8 @@ public class RatingService {
                 + "If you have any questions, feel free to reach out to our support team.\n\n"
                 + "Best regards,\n"
                 + "InternX Team";
-        emailService.sendEmail(
-                toUser.getEmail(),
-                "You received a new rating - InternX", message);
+        emailService.sendEmail(toUser.getEmail(), "You received a new rating - InternX", message);
         return mapToResponse(saved);
-
     }
 
     public List<RatingResponse> getStudentRatings(Long userId) {
@@ -102,6 +97,5 @@ public class RatingService {
                 .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
-
     }
 }

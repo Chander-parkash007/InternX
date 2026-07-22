@@ -1,10 +1,14 @@
 import axios from 'axios'
 
-// In production (Vercel), use the VITE_API_URL env variable pointing to Railway
-// In development, use '/' so Vite proxy handles it
 const baseURL = import.meta.env.VITE_API_URL || '/'
 
-const api = axios.create({ baseURL })
+const api = axios.create({
+  baseURL,
+  headers: {
+    // Bypass Cloudflare browser check for API calls
+    'bypass-tunnel-reminder': 'true',
+  }
+})
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token')

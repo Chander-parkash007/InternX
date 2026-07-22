@@ -1,0 +1,64 @@
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: internx-mysql
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Karachi
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: internx
+    ports:
+      - "3307:3306"
+    volumes:
+      - internx-mysql-data:/var/lib/mysql
+    networks:
+      - internx-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: .
+    container_name: internx-backend
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      TZ: Asia/Karachi
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/internx
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
+      SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME}
+      SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD}
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - internx-network
+
+  frontend:
+    build: ./internx-frontend
+    container_name: internx-frontend
+    restart: unless-stopped
+    ports:
+      - "3001:80"
+    depends_on:
+      - backend
+    networks:
+      - internx-network
+
+volumes:
+  internx-mysql-data:
+    driver: local
+
+networks:
+  internx-network:
+    driver: bridge

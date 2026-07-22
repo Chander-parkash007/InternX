@@ -28,7 +28,7 @@ public class PostLike {
     private User user;
 
     @Column(name = "reaction_type", length = 10)
-    private String reactionType; // Stores emoji: 👍, ❤️, 😂, 😮, 😢, 🎉
+    private String reactionType; // Stores emoji thumbs up
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;

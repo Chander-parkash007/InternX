@@ -32,7 +32,6 @@ public class ConnectionService {
         connection.setReceiver(receiver);
         connection.setStatus(Connection.ConnectionStatus.PENDING);
         connectionRepository.save(connection);
-        // Notify receiver
         notificationsService.createNotification(receiver,
                 requester.getName() + " sent you a connection request.");
     }
@@ -46,7 +45,6 @@ public class ConnectionService {
         if (!connection.getReceiver().getId().equals(userId)) throw new RuntimeException("Not authorized");
         connection.setStatus(Connection.ConnectionStatus.ACCEPTED);
         connectionRepository.save(connection);
-        // Notify requester
         notificationsService.createNotification(requester,
                 user.getName() + " accepted your connection request.");
     }

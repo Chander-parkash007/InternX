@@ -61,7 +61,6 @@ public class SkillService {
         response.setSkillName(saved.getSkill().getSkillName());
         response.setLevel(saved.getLevel());
         return response;
-
     }
 
     public List<SkillResponse> getMySkills() {
@@ -75,7 +74,6 @@ public class SkillService {
         return userSkills.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
-
     }
 
     public List<SkillResponse> getUserSkills(Long userId) {
